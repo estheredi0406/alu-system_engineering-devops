@@ -1,4 +1,6 @@
 # ssh config file
 Host 172.17.0.5
+      User ubuntu
       PasswordAuthentication no
+      IdentityFile ~/.ssh/id_rsa 
       IdentifyFile ~/.ssh/school
