@@ -11,28 +11,37 @@
 apt-get update
 apt-get install -y nginx
 
+# Set up web root and files
 mkdir -p /var/www/html
-touch /var/www/html/index.html
 echo "Hello World" > /var/www/html/index.html
-touch /var/www/html/404.html
 echo "Ceci n'est pas une page" > /var/www/html/404.html
 
-printf %s "server {
+# Configure Nginx
+cat > /etc/nginx/sites-available/default << EOF
+server {
     listen 80 default_server;
     listen [::]:80 default_server;
-    add_header X-Served-By $HOSTNAME;
-    root   /var/www/html;
-    index  index.html index.htm;
 
+    # Custom header to show server hostname
+    add_header X-Served-By \$HOSTNAME;
+
+    root /var/www/html;
+    index index.html index.htm;
+
+    # Redirect
     location /redirect_me {
         return 301 http://cuberule.com/;
     }
 
+    # Custom 404 page
     error_page 404 /404.html;
     location /404 {
-      root /var/www/html;
-      internal;
+        internal;
     }
-}" > /etc/nginx/sites-available/default
+}
+EOF
 
-service nginx restart
+# Reload Nginx to apply the new configuration
+systemctl reload nginx
+
+echo "Nginx has been configured with the X-Served-By header and custom 404 page."
